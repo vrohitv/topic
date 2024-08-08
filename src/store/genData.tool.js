@@ -17,6 +17,7 @@ function recursiveGenerate(n){
             props:{},
             children: recursiveGenerate(n - 1)
         }
+        j.children ? j.numChildren = j.children.length : ""
         arr.push(j)
     }
     return arr
@@ -30,11 +31,12 @@ var jso = {
     ]
 }
 var finArr = []
-for(let i = 0; i < 10; i++){
+for(let i = 0; i < 5; i++){
     var clone = structuredClone(jso)
     clone.id = uuid()
     clone.name = faker.person.fullName()
     clone.children = recursiveGenerate(5)
+    clone.numChildren = clone.children.length
     finArr.push(clone)
 }
 
