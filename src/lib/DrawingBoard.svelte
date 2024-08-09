@@ -1,0 +1,140 @@
+<script>
+    // @ts-nocheck
+    import {
+        Textarea,
+        Toolbar,
+        ToolbarGroup,
+        ToolbarButton,
+        Button,
+        Toggle
+    } from "flowbite-svelte";
+    import {
+        PaperClipOutline,
+        MapPinAltSolid,
+        ImageOutline,
+        CodeOutline,
+        FaceGrinOutline,
+        PaperPlaneOutline,
+        PlusOutline
+    } from "flowbite-svelte-icons";
+    import DrawingCanvas from "./DrawingCanvas.svelte";
+    import {eraserOn} from "../store/drawingStore";
+    import { onMount } from "svelte";
+    import { v4 as uuidv4 } from "uuid";
+    import {drawingStore} from "../store/drawingStore"
+    let drawingData = $drawingStore.noteBookData;
+    $:{
+        if(typeof(drawingData) == "string" ){
+            drawingData = JSON.parse(drawingData)
+        }
+    }
+    export let drawingBoardopen
+    var isPen = false;
+    onMount(() => {
+        document.getElementById("canvasesHolder").addEventListener(
+            "pointerdown",
+            function (e) {
+                if (e.pointerType === "pen") {
+                    isPen = true;
+                    // console.log("draw");
+                } else {
+                    isPen = false;
+                }
+                e.preventDefault();
+            },
+            {
+                capture: true,
+            },
+        );
+        document.getElementById("canvasesHolder").addEventListener(
+            "touchstart",
+            function (e) {
+                if (isPen) {
+                    e.preventDefault();
+                }
+            },
+            {
+                passive: false,
+                capture: false,
+            },
+        );
+    });
+    function closeNoteBook(){
+        console.log(drawingData)
+        for(let i in drawingData){
+            drawingData[i].stageData = drawingData[i].stageData.toJSON()
+        }
+        drawingStore.saveNotebook(drawingData)
+        drawingBoardopen = false
+    }
+    function openAddPage(){
+        var page = {
+            pageID:uuidv4(),
+            stageData:{}
+        }
+        drawingData.push(page)
+        drawingData = drawingData
+
+    }
+</script>
+
+<div class="container rounded">
+    <div class=" mb-2 p-2 border-b-2">
+
+        <Toolbar slot="header" embedded>
+            <ToolbarGroup>
+                <ToolbarButton on:click={openAddPage} name="Attach file"
+                    ><PlusOutline
+                        class="w-5 h-5"
+                    /></ToolbarButton
+                >
+                <!-- <ToolbarButton name="Embed map"
+                    ><MapPinAltSolid class="w-5 h-5" /></ToolbarButton
+                >
+                <ToolbarButton name="Upload image"
+                    ><ImageOutline class="w-5 h-5" /></ToolbarButton
+                > -->
+            </ToolbarGroup>
+            <ToolbarGroup>
+                <!-- <ToolbarButton name="Format code"
+                    ><CodeOutline class="w-5 h-5" /></ToolbarButton
+                > -->
+                <Toggle on:change={(e)=>{
+                    console.log(e)
+                    eraserOn.update(d=>!d)
+                }} class="border-2 rounded p-1">Eraser</Toggle>
+            </ToolbarGroup>
+            <ToolbarButton on:click={closeNoteBook} name="send" slot="end"
+                ><PlusOutline
+                class="w-5 h-5 rotate-45"
+            /></ToolbarButton
+            >
+        </Toolbar>
+    </div>
+    <div id="canvasesHolder" class="overflow-scroll w-full h-[calc(100%-90px)]">
+        {#each drawingData as data}
+            <DrawingCanvas
+                pageID={data.pageID}
+                bind:stage={data.stageData}
+                width="990"
+                height="800"
+            ></DrawingCanvas>
+        {/each}
+    </div>
+</div>
+
+<style>
+    .container {
+        position: absolute;
+        width: 1000px;
+        min-width: 1000px;
+        min-height: 700px;
+        height: 700px;
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        background-color: white;
+        z-index: 5;
+        border: 2px solid;
+    }
+</style>

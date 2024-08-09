@@ -1,51 +1,96 @@
 <script>
-// @ts-nocheck
+    // @ts-nocheck
 
-    import { Button,Badge } from 'flowbite-svelte';
-    import { PlusOutline, AngleRightOutline } from 'flowbite-svelte-icons';
+    import { Button, Badge } from "flowbite-svelte";
+    import { PlusOutline, AngleRightOutline } from "flowbite-svelte-icons";
     export let data = [];
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, onDestroy } from "svelte";
+    import { topic } from "../store/topicData";
     const dispatch = createEventDispatcher();
     const goToTopic = (e) => {
-        dispatch("goToTopic", {
-            text: "Hello!",
-        });
+        var el = e.target;
+        while (el.nodeName != "LI") {
+            // console.log(el)
+            el = el.parentNode;
+        }
+        console.log(el);
+        topic.setCurrentTopic(el.id)
+        document.dispatchEvent(new CustomEvent("topicOpenInEditor",{detail:el.id}))
     };
     const addSubTopic = (e) => {
-        dispatch("addSubTopic", {
-            text: "Hello!",
-        });
+        var el = e.target;
+        while (el.nodeName != "LI") {
+            // console.log(el)
+            el = el.parentNode;
+        }
+        var name = prompt("Enter your heading name");
+        if (!name) {
+            return;
+        }
+        console.log(el);
+        topic.addSubTopic(el.id,name);
     };
 </script>
 
 <ul>
     {#each data as data}
         {#if data.children}
-        <li>
-            <details open>
-                <summary class="mb-4 rounded outline h-[36px] flex justify-between flex-row items-center"> 
-                    <div class="ml-2 truncate">
-                        <p>{data.name}</p>
-                    </div>
-                    <div class="relative top-[4px]">
-                        <Button on:click={addSubTopic(data.id)}  color="dark" outline={true} class="mx-2 !p-2 w-[25px] h-[25px] bg-transparent"><PlusOutline class="w-6 h-6" /></Button>
-                        <Button on:click={goToTopic(data.id)} color="dark" outline={true} class="mr-2 !p-2 w-[25px] h-[25px] bg-transparent"><AngleRightOutline class="w-6 h-6" /></Button>
-                        <Badge class="relative bottom-[6px] right-1">{data.numChildren}</Badge>
-                    </div>
-                </summary>
-                <svelte:self data={data.children}/>
-            </details>
-        </li>
+            <li id={data.id}>
+                <details open>
+                    <summary
+                        class="mb-4 rounded outline h-[36px] flex justify-between flex-row items-center"
+                    >
+                        <div class="ml-2 truncate">
+                            <p>{data.name}</p>
+                        </div>
+                        <div class="relative top-[4px]">
+                            <Button
+                                on:click={addSubTopic}
+                                color="dark"
+                                outline={true}
+                                class="mx-2 !p-2 w-[25px] h-[25px] bg-transparent"
+                                ><PlusOutline class="w-6 h-6" /></Button
+                            >
+                            <Button
+                                on:click={goToTopic}
+                                color="dark"
+                                outline={true}
+                                class="mr-2 !p-2 w-[25px] h-[25px] bg-transparent"
+                                ><AngleRightOutline class="w-6 h-6" /></Button
+                            >
+                            <Badge class="relative bottom-[6px] right-1"
+                                >{data.numChildren}</Badge
+                            >
+                        </div>
+                    </summary>
+                    <svelte:self data={data.children} />
+                </details>
+            </li>
         {:else}
-        <li class="mb-4  rounded h-[36px] flex justify-between flex-row items-center outline">
-            <div class="ml-2 truncate max-w-[50%]">
-                <p>{data.name}</p>
-            </div>
-            <div class="relative top-[4px]">
-                <Button on:click={addSubTopic(data.id)}  color="dark" outline={true} class="mx-2 !p-2 w-[25px] h-[25px] bg-transparent"><PlusOutline class="w-6 h-6" /></Button>
-                <Button on:click={goToTopic(data.id)} color="dark" outline={true} class="mr-2 !p-2 w-[25px] h-[25px] bg-transparent"><AngleRightOutline class="w-6 h-6" /></Button>
-            </div>
-        </li>
+            <li
+                id={data.id}
+                class="mb-4 rounded h-[36px] flex justify-between flex-row items-center outline"
+            >
+                <div class="ml-2 truncate max-w-[50%]">
+                    <p>{data.name}</p>
+                </div>
+                <div class="relative top-[4px]">
+                    <Button
+                        on:click={addSubTopic}
+                        color="dark"
+                        outline={true}
+                        class="mx-2 !p-2 w-[25px] h-[25px] bg-transparent"
+                        ><PlusOutline class="w-6 h-6" /></Button
+                    >
+                    <Button
+                        on:click={goToTopic}
+                        color="dark"
+                        outline={true}
+                        class="mr-2 !p-2 w-[25px] h-[25px] bg-transparent"
+                        ><AngleRightOutline class="w-6 h-6" /></Button
+                    >
+                </div>
+            </li>
         {/if}
     {/each}
 </ul>
@@ -70,7 +115,7 @@
     ul li::before {
         position: absolute;
         left: -10px;
-        top:-1em;
+        top: -1em;
         border-left: 2px solid gray;
         border-bottom: 2px solid gray;
         content: "";

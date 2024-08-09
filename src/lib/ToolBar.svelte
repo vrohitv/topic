@@ -26,6 +26,7 @@
         if(e.key == "Enter"){
             console.log(innerHTML)
         }
+        topic.changeTopicName(innerHTML)
     }
     const handleAddHeading = (e) => {
         dispatch("addTopicHeading", {

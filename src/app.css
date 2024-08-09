@@ -3,13 +3,42 @@
 @import "tailwindcss/utilities";
 
 @layer base {
-    *,
-    ::before,
-    ::after {
-      border-width: 0;
-      border-style: solid;
-      border-color: theme('borderColor.DEFAULT', currentColor);
-    }
-    
+
+  *,
+  ::before,
+  ::after {
+    border-width: 0;
+    border-style: solid;
+    border-color: theme('borderColor.DEFAULT', currentColor);
+  }
+
 }
 
+.editor-drawing-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.editor-drawing-container div {
+  border: 2px solid;
+  border-radius: 5px;
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #e4e4e4;
+  border-radius: 3px;
+  outline: none;
+  font-size: 14px;
+}
+
+.editor-drawing-container button {
+  margin-left: 5px;
+  border: 1px solid #e4e4e4;
+  border-radius: 3px;
+ background-color:white ;
+}
+
+.editor-drawing-container button:hover {
+  background-color:#EEEEEE ;
+ }.editor-drawing-container button:active {
+  background-color:#E2DAD6  ;
+ }

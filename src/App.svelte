@@ -1,6 +1,6 @@
 <script>
   // @ts-nocheck
-
+  import DrawingBoard from "./lib/DrawingBoard.svelte";
   import "./app.css";
   import t from "./store/topicLite.json";
   import {
@@ -18,19 +18,44 @@
   import { Breadcrumb, BreadcrumbItem } from "flowbite-svelte";
   import ToolBar from "./lib/ToolBar.svelte";
   import Editor from "./lib/Editor.svelte";
+  import { drawingStore } from "./store/drawingStore";
   let selected = $headingSelectData.selected;
+  let drawingBoardopen = false;
+  let editor;
   function headingChange() {
     topic.setCurrentHeading(selected);
   }
-  function addTopicHeading(e) {}
-  function addTopicInHeading(e) {}
-  function addSubTopic(e) {}
-  function goToTopic(e) {}
-  function deleteHeading(e){}
-  function deleteTopic(e){}
+  function addTopicHeading(e) {
+    var name = prompt("Enter your heading name");
+    if (!name) {
+      return;
+    }
+    topic.addTopicHeading(name);
+  }
+  function addTopicInHeading(e) {
+    var name = prompt("Enter your topic name");
+    if (!name) {
+      return;
+    }
+    topic.addTopicInHeading(name);
+  }
+  function addSubTopic(e) {
+    console.log(e.detail.id);
+    topic.addSubTopic(e.detail.id);
+  }
+  function deleteHeading(e) {}
+  function deleteTopic(e) {}
+  document.body.addEventListener("OpenDrawingCanvas", (e) => {
+    console.log(e.detail);
+    drawingStore.setCurrentNotebookID(e.detail);
+    drawingBoardopen = true;
+  });
 </script>
 
 <main>
+  {#if drawingBoardopen}
+    <DrawingBoard bind:drawingBoardopen />
+  {/if}
   <div class="flex flex-row">
     <!-- Sidebar -->
     <div class="w-[400px] h-full border-r-2 border-black grow-1">
@@ -46,11 +71,7 @@
       <div
         class="mr-2 w-[400px] h-[90vh] overflow-scroll relative top-[-8px] right-[8px]"
       >
-        <TreeView
-          on:addSubTopic={addSubTopic}
-          on:goToTopic={goToTopic}
-          data={$topicTreeDataRead}
-        />
+        <TreeView data={$topicTreeDataRead} />
       </div>
     </div>
     <!-- //EDitor -->
@@ -64,7 +85,7 @@
         ></ToolBar>
       </div>
       <div class="mx-12">
-        <Editor></Editor>
+        <Editor bind:editor></Editor>
       </div>
     </div>
   </div>

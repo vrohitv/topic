@@ -1,4 +1,5 @@
 import { writable,derived } from 'svelte/store';
+import { v4 as uuidv4 } from 'uuid';
 import t from "./topicLite.json"
 function recSearch(data,id,func){
     for(let i in data){
@@ -8,7 +9,7 @@ function recSearch(data,id,func){
             if(!data[i].children){
                 continue
             }
-            var y = recSearch(data[i].children,id)
+            var y = recSearch(data[i].children,id,func)
             if(!y){
                 continue
             }
@@ -24,20 +25,61 @@ function topicHeadandMeta(){
         currentTopic:"Untitled",
         currentTopicID:null,
         currentDrawingID:null,
+        currentEditorID:null,
         data:t
     })
     return {
         subscribe,
         addTopicHeading:(name)=>{
             var ne = {
-                id: crypto.randomUUID(),
+                id: uuidv4(),
                 name,
-                editorID: crypto.randomUUID(),
-                drawingID: crypto.randomUUID(),
-                props:{}
+                children:[],
+                numChildren:0
             }
             update((data) =>{
-                    
+                data.data.push(ne)
+                return data
+            })
+        },
+        addTopicInHeading:(name)=>{
+            var ne = {
+                id: uuidv4(),
+                name,
+                editorID: uuidv4(),
+                drawingID: uuidv4(),
+                props:{}
+            }
+            update(data=>{
+                for(let i in data.data){
+                    if(data.data[i].id == data.currentHeading){
+                        data.data[i].children.push(ne)
+                        return data
+                    }
+                }
+                throw new Error("Id not found to append child")
+            })
+        },
+        addSubTopic:(id,name)=>{
+            var ne = {
+                id: uuidv4(),
+                name,
+                editorID: uuidv4(),
+                drawingID: uuidv4(),
+                props:{}
+            }
+            update(data =>{
+                recSearch(data.data, id,(d)=>{
+                    console.log(d)
+        if(d.children){
+            d.children.push(ne)
+            d.numChildren = d.numChildren + 1
+        }else{
+            d.children = [ne]
+            d.numChildren = 1
+        }
+                })
+                return data
             })
         },
         setCurrentHeading:(id) =>{
@@ -47,7 +89,31 @@ function topicHeadandMeta(){
             })
         },
         setCurrentTopic:(id)=>{
-
+            update((data)=>{
+                var x = recSearch(data.data,id,(d)=>{
+                    return {
+                        currentTopicID: d.id,
+                        currentTopic: d.name,
+                        currentDrawingID: d.drawingID,
+                        currentEditorID: d.editorID
+                    }
+                })
+                console.log(data)
+                data.currentEditorID = x.currentEditorID
+                data.currentTopicID = x.currentTopicID
+                data.currentTopic = x.currentTopic
+                data.currentDrawingID = x.currentDrawingID
+                console.log(x)
+                return data
+            })
+        },
+        changeTopicName:(name)=>{
+            update((data)=>{
+                recSearch(data.data,data.currentTopicID, (d)=>{
+                    d.name = name
+                })
+                return data
+            })
         }
     }   
 }
