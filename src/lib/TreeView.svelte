@@ -13,7 +13,7 @@
             // console.log(el)
             el = el.parentNode;
         }
-        console.log(el);
+        // console.log(el);
         topic.setCurrentTopic(el.id)
         document.dispatchEvent(new CustomEvent("topicOpenInEditor",{detail:el.id}))
     };
@@ -40,7 +40,7 @@
                     <summary
                         class="mb-4 rounded outline h-[36px] flex justify-between flex-row items-center"
                     >
-                        <div class="ml-2 truncate">
+                        <div class="ml-2 max-w-[50%] truncate">
                             <p>{data.name}</p>
                         </div>
                         <div class="relative top-[4px]">
@@ -48,15 +48,15 @@
                                 on:click={addSubTopic}
                                 color="dark"
                                 outline={true}
-                                class="mx-2 !p-2 w-[25px] h-[25px] bg-transparent"
-                                ><PlusOutline class="w-6 h-6" /></Button
+                                class="mx-2 !p-2 w-[20px] h-[20px] bg-transparent"
+                                ><PlusOutline class="w-5 h-5" /></Button
                             >
                             <Button
                                 on:click={goToTopic}
                                 color="dark"
                                 outline={true}
-                                class="mr-2 !p-2 w-[25px] h-[25px] bg-transparent"
-                                ><AngleRightOutline class="w-6 h-6" /></Button
+                                class="mr-2 !p-2 w-[20px] h-[20px] bg-transparent"
+                                ><AngleRightOutline class="w-5 h-5" /></Button
                             >
                             <Badge class="relative bottom-[6px] right-1"
                                 >{data.numChildren}</Badge
@@ -71,7 +71,7 @@
                 id={data.id}
                 class="mb-4 rounded h-[36px] flex justify-between flex-row items-center outline"
             >
-                <div class="ml-2 truncate max-w-[50%]">
+                <div class="ml-2 truncate max-w-[60%]">
                     <p>{data.name}</p>
                 </div>
                 <div class="relative top-[4px]">
@@ -79,15 +79,15 @@
                         on:click={addSubTopic}
                         color="dark"
                         outline={true}
-                        class="mx-2 !p-2 w-[25px] h-[25px] bg-transparent"
-                        ><PlusOutline class="w-6 h-6" /></Button
+                        class="mx-2 !p-2 w-[20px] h-[20px] bg-transparent"
+                        ><PlusOutline class="w-5 h-5" /></Button
                     >
                     <Button
                         on:click={goToTopic}
                         color="dark"
                         outline={true}
-                        class="mr-2 !p-2 w-[25px] h-[25px] bg-transparent"
-                        ><AngleRightOutline class="w-6 h-6" /></Button
+                        class="mr-2 !p-2 w-[20px] h-[20px] bg-transparent"
+                        ><AngleRightOutline class="w-5 h-5" /></Button
                     >
                 </div>
             </li>

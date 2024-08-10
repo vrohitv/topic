@@ -5,25 +5,45 @@
     import Header from "@editorjs/header";
     import List from "@editorjs/list";
     import { onMount } from "svelte";
-    import {Drawing } from "./EditorDrawing"
+    import { Drawing } from "./EditorDrawing";
+    import { getEditorData, syncTopicEditorData } from "./Editor.helper";
     export let editor;
-    let currentID
-    document.addEventListener("topicOpenInEditor", async(e) => {
+    let currentID;
+
+    document.addEventListener("topicOpenInEditor", async (e) => {
         var data = localStorage.getItem(e.detail);
-        currentID = e.detail
+        currentID = e.detail;
         if (!data) {
-            await editor.blocks.render({"time":1723084898048,"blocks":[{"id":"IxoomqzyjD","type":"paragraph","data":{"text":"Start of Something new&nbsp;"}}],"version":"2.30.2"})
-            return;
+            var resp =  await getEditorData(currentID)
+            if(resp.status != 200){
+            return await editor.blocks.render({
+                time: 1723084898048,
+                blocks: [
+                    {
+                        id: "IxoomqzyjD",
+                        type: "paragraph",
+                        data: { text: "..." },
+                    },
+                ],
+                version: "2.30.2",
+            });
+            }
+            resp = await resp.json()
+            console.log(resp)
+            localStorage.setItem(currentID,JSON.stringify(resp.editor_data))
+            return await editor.blocks.render(resp.editor_data);
         }
-        await editor.blocks.render(JSON.parse(data))
-        
+        await editor.blocks.render(JSON.parse(data));
     });
     function onChangeHandler(e) {
         editor
             .save()
             .then((outputData) => {
                 console.log("Article data: ", outputData);
-                localStorage.setItem(currentID,JSON.stringify(outputData))
+                syncTopicEditorData(outputData, currentID).then(() => {
+                    console.log("Synced Editor Data");
+                    localStorage.setItem(currentID, JSON.stringify(outputData));
+                });
             })
             .catch((error) => {
                 console.log("Saving failed: ", error);
@@ -42,9 +62,9 @@
                     class: List,
                     inlineToolbar: true,
                 },
-                drawing:{
-                    class:Drawing
-                }
+                drawing: {
+                    class: Drawing,
+                },
             },
             onChange: onChangeHandler,
         });
@@ -56,5 +76,4 @@
 </div>
 
 <style>
-    
 </style>

@@ -1,14 +1,20 @@
+// @ts-nocheck
 import {v4 as uuidv4} from "uuid"
 export class Drawing{
     constructor({data}){
         // this.data = data
         this.data = {}
-        if(this.data == null || this.data == undefined){
+        console.log(this.data,data)
+        if(data == null || Object.keys(data).length == 0 ){
             this.data.id = uuidv4()
+            console.log("HIT")
         }else{
             this.data.id = data.id
+            console.log("LOose")
         }
         this.data.name = data.name ? data.name : "Note book 1"
+        console.log(this.data)
+
     }
     static get toolbox() {
         return {
@@ -26,6 +32,7 @@ export class Drawing{
         const button = document.createElement("button")
         button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>'
         button.onclick= (e)=>{
+            console.log(this.data.id)
             document.body.dispatchEvent(new CustomEvent("OpenDrawingCanvas",{detail:this.data.id}))
         }
         wrapper.classList.add("editor-drawing-container");

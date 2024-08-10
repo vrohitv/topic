@@ -3,13 +3,24 @@
 @import "tailwindcss/utilities";
 
 @layer base {
-
+  html{
+    width:100%;
+    height: 100%;
+  }
+  #app{
+    width:100%;
+    height: 100%;
+  }
   *,
   ::before,
   ::after {
     border-width: 0;
     border-style: solid;
     border-color: theme('borderColor.DEFAULT', currentColor);
+  }
+  body{
+    margin:0;
+    height:100%;
   }
 
 }

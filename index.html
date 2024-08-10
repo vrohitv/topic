@@ -8,6 +8,18 @@
   </head>
   <body>
     <div id="app"></div>
+    <script>
+      if(!localStorage.getItem("token")){
+        window.location.href = "https://login.venkatrohit.com"
+      }
+      var url = new URL(window.location.href);
+      var c = url.searchParams.get("token");
+      if(c){
+        localStorage.setItem("token",c)
+        window.location.href = "/"
+      }
+    </script>
     <script type="module" src="/src/main.js"></script>
   </body>
+
 </html>
