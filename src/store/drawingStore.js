@@ -31,7 +31,7 @@ function drawingCanvasStore() {
             }
             update((d) => {
                 d.currentNoteBookID = id
-                d.noteBookData = noteBookData ? noteBookData : data
+                d.noteBookData = noteBookData ? JSON.parse(noteBookData) : JSON.parse(data)
                 console.log(d,"updated data")
                 return d
             })
