@@ -11,6 +11,7 @@
         Checkbox,
         Breadcrumb,
         BreadcrumbItem,
+        Spinner
     } from "flowbite-svelte";
     import {
         HomeOutline,
@@ -19,69 +20,49 @@
         ChevronDownOutline,
     } from "flowbite-svelte-icons";
     import { createEventDispatcher } from "svelte";
-    import {topic} from "../store/topicData"
+    import {
+        topic,
+        topicTreeDataRead,
+        headingSelectData,
+        syncTopicHeadingData,
+        recSearch,
+        getTopicDataFromServer,
+    } from "../store/topicData";
+    import { spinner } from "../store/spinner";
     let innerHTML;
     const dispatch = createEventDispatcher();
-    const topicTitlechange = (e)=>{
-        if(e.key == "Enter"){
-            console.log(innerHTML)
+    const topicTitlechange = (e) => {
+        if (e.key == "Enter") {
+            console.log(innerHTML);
+            update((data) => {
+                recSearch(data.data, data.currentTopicID, (d) => {
+                    d.name = innerHTML;
+                });
+                syncTopicHeadingData(data).then(() => {
+                    console.log("Synced");
+                });
+                return data;
+            });
         }
-        topic.changeTopicName(innerHTML)
-    }
-    const handleAddHeading = (e) => {
-        dispatch("addTopicHeading", {
-            id:e
-        });
-    };
-    const handleAddTopic = (e) => {
-        dispatch("addTopicInHeading", {
-            id:e
-        });
-    };
-    const deleteHeading = (e) => {
-        dispatch("deleteHeading", {
-            id:e
-        });
-    };
-    const deleteTopic = (e) => {
-        dispatch("deleteTopic", {
-            id:e
-        });
     };
 </script>
 
 <div>
     <Toolbar>
-        <Button class="mr-2" size="sm"
-            >Add<ChevronDownOutline
-                class="w-6 h-6 ms-2 text-white dark:text-white"
-            /></Button
-        >
-        <Dropdown class="list-none list-outside">
-            <DropdownItem on:click={handleAddHeading}>Add Heading</DropdownItem>
-            <DropdownItem on:click={handleAddTopic}>Add Topic</DropdownItem>
-        </Dropdown>
-        <Button class="mr-2" size="sm"
-            >Delete<ChevronDownOutline
-                class="w-6 h-6 ms-2 text-white dark:text-white"
-            /></Button
-        >
-        <Dropdown class="list-none list-outside">
-            <DropdownItem on:click={handleAddHeading}>Delete Heading</DropdownItem>
-            <DropdownItem on:click={handleAddTopic}>Delete Topic</DropdownItem>
-        </Dropdown>
-        <!-- <ToolbarButton><HomeOutline class="w-6 h-6" /></ToolbarButton>
-        <ToolbarButton><EnvelopeOutline class="w-6 h-6" /></ToolbarButton>
-        <ToolbarButton><ImageOutline class="w-6 h-6" /></ToolbarButton>
-        <Breadcrumb aria-label="Default breadcrumb example">
-            <BreadcrumbItem href="/" home>Home</BreadcrumbItem>
-            <BreadcrumbItem href="/">Projects</BreadcrumbItem>
-            <BreadcrumbItem>Flowbite Svelte</BreadcrumbItem>
-        </Breadcrumb> -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div contenteditable on:keypress={topicTitlechange} class="p-2 border-2 rounded" bind:innerHTML={innerHTML}>
+        <div
+            contenteditable
+            on:keypress={topicTitlechange}
+            class="p-2 whitespace-nowrap border-2 rounded"
+            bind:innerHTML
+        >
             {$topic.currentTopic}
         </div>
+        {#if $spinner}
+        <div>
+            <Spinner/>
+        </div>
+        {/if}
     </Toolbar>
 </div>
 

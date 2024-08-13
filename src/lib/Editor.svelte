@@ -7,16 +7,18 @@
     import { onMount } from "svelte";
     import { Drawing } from "./EditorDrawing";
     import { getEditorData, syncTopicEditorData } from "./Editor.helper";
+    import {spinner} from "../store/spinner"
     export let editor;
     let currentID;
 
     document.addEventListener("topicOpenInEditor", async (e) => {
-        var data = localStorage.getItem(e.detail);
         currentID = e.detail;
-        if (!data) {
-            var resp =  await getEditorData(currentID)
-            if(resp.status != 200){
-            return await editor.blocks.render({
+        spinner.set(true)
+        console.log("spin")
+
+        var resp = await getEditorData(currentID);
+        if (resp.status != 200) {
+            await editor.blocks.render({
                 time: 1723084898048,
                 blocks: [
                     {
@@ -27,27 +29,24 @@
                 ],
                 version: "2.30.2",
             });
-            }
-            resp = await resp.json()
-            console.log(resp)
-            localStorage.setItem(currentID,JSON.stringify(resp.editor_data))
-            return await editor.blocks.render(resp.editor_data);
+            console.log("spind")
+            spinner.set(false)
+            return
         }
-        await editor.blocks.render(JSON.parse(data));
+        resp = await resp.json();
+        // console.log(resp);
+        await editor.blocks.render(resp.editor_data);
+        console.log("spind")
+        spinner.set(false)
     });
-    function onChangeHandler(e) {
-        editor
-            .save()
-            .then((outputData) => {
-                console.log("Article data: ", outputData);
-                syncTopicEditorData(outputData, currentID).then(() => {
-                    console.log("Synced Editor Data");
-                    localStorage.setItem(currentID, JSON.stringify(outputData));
-                });
-            })
-            .catch((error) => {
-                console.log("Saving failed: ", error);
-            });
+    async function onChangeHandler(e) {
+        spinner.set(true)
+        console.log("spin")
+        var outputData  = await editor.save()
+        console.log("Article data: ", outputData);
+        var resp = await syncTopicEditorData(outputData, currentID)
+        console.log("spind")
+        spinner.set(false)
     }
     onMount(() => {
         editor = new EditorJS({

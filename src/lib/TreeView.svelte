@@ -2,10 +2,19 @@
     // @ts-nocheck
 
     import { Button, Badge } from "flowbite-svelte";
+    import { v4 as uuidv4 } from "uuid";
+
     import { PlusOutline, AngleRightOutline } from "flowbite-svelte-icons";
     export let data = [];
     import { createEventDispatcher, onDestroy } from "svelte";
-    import { topic } from "../store/topicData";
+    import {
+        topic,
+        topicTreeDataRead,
+        headingSelectData,
+        syncTopicHeadingData,
+        recSearch,
+        getTopicDataFromServer,
+    } from "../store/topicData.js";
     const dispatch = createEventDispatcher();
     const goToTopic = (e) => {
         var el = e.target;
@@ -14,8 +23,24 @@
             el = el.parentNode;
         }
         // console.log(el);
-        topic.setCurrentTopic(el.id)
-        document.dispatchEvent(new CustomEvent("topicOpenInEditor",{detail:el.id}))
+        topic.update((data) => {
+                var x = recSearch(data.data, el.id, (d) => {
+                    return {
+                        currentTopicID: d.id,
+                        currentTopic: d.name,
+                        currentDrawingID: d.drawingID,
+                        currentEditorID: d.editorID
+                    }
+                })
+                data.currentEditorID = x.currentEditorID
+                data.currentTopicID = x.currentTopicID
+                data.currentTopic = x.currentTopic
+                data.currentDrawingID = x.currentDrawingID
+                return data
+            })
+        document.dispatchEvent(
+            new CustomEvent("topicOpenInEditor", { detail: el.id }),
+        );
     };
     const addSubTopic = (e) => {
         var el = e.target;
@@ -23,12 +48,34 @@
             // console.log(el)
             el = el.parentNode;
         }
-        var name = prompt("Enter your heading name");
+        var name = prompt("Enter your topic name");
         if (!name) {
             return;
         }
-        console.log(el);
-        topic.addSubTopic(el.id,name);
+        var ne = {
+            id: uuidv4(),
+            name,
+            editorID: uuidv4(),
+            drawingID: uuidv4(),
+            props: {},
+        };
+        topic.update((data) => {
+            console.log(data)
+            recSearch(data.data, el.id, (d) => {
+                if (d.children) {
+                    d.children.push(ne);
+                    d.numChildren = d.numChildren + 1;
+                } else {
+                    d.children = [ne];
+                    d.numChildren = 1;
+                }
+            });
+            syncTopicHeadingData(data).then(() => {
+                console.log("Synced");
+            });
+            console.log(data)
+            return data;
+        });
     };
 </script>
 
@@ -38,7 +85,7 @@
             <li id={data.id}>
                 <details open>
                     <summary
-                        class="mb-4 rounded outline h-[36px] flex justify-between flex-row items-center"
+                        class="mb-4 rounded border-2 h-[36px] flex justify-between flex-row items-center"
                     >
                         <div class="ml-2 max-w-[50%] truncate">
                             <p>{data.name}</p>
@@ -58,7 +105,9 @@
                                 class="mr-2 !p-2 w-[20px] h-[20px] bg-transparent"
                                 ><AngleRightOutline class="w-5 h-5" /></Button
                             >
-                            <Badge class="relative bottom-[6px] right-1"
+                            <Badge
+                                color="dark"
+                                class="relative bottom-[6px] right-1"
                                 >{data.numChildren}</Badge
                             >
                         </div>
@@ -69,7 +118,7 @@
         {:else}
             <li
                 id={data.id}
-                class="mb-4 rounded h-[36px] flex justify-between flex-row items-center outline"
+                class="mb-4 rounded h-[36px] flex justify-between flex-row items-center border-2"
             >
                 <div class="ml-2 truncate max-w-[60%]">
                     <p>{data.name}</p>
@@ -96,6 +145,9 @@
 </ul>
 
 <style>
+    :root {
+        --tree-line-color: #eeeeee;
+    }
     ul {
         list-style: none;
         line-height: 2em;
@@ -110,23 +162,24 @@
     }
     ul li {
         position: relative;
+        margin-right: 8px;
         /* outline:1px solid green; */
     }
     ul li::before {
         position: absolute;
         left: -10px;
-        top: -1em;
-        border-left: 2px solid gray;
-        border-bottom: 2px solid gray;
+        top: -1.12em;
+        border-left: 2px solid var(--tree-line-color);
+        border-bottom: 2px solid var(--tree-line-color);
         content: "";
         width: 8px;
-        height: 2em;
+        height: 2.3em;
     }
     ul li::after {
         position: absolute;
         left: -10px;
         bottom: 0px;
-        border-left: 2px solid gray;
+        border-left: 2px solid var(--tree-line-color);
         content: "";
         width: 8px;
         height: 100%;

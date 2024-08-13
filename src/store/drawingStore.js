@@ -2,6 +2,7 @@
 import { writable } from 'svelte/store';
 import { v4 as uuidv4 } from "uuid"
 import { getDrawingData, syncTopicDrawingData } from "./DrawingBoard.helper"
+import { spinner } from './spinner';
 export const eraserOn = writable(false)
 
 function drawingCanvasStore() {
@@ -12,36 +13,43 @@ function drawingCanvasStore() {
     return {
         subscribe,
         setCurrentNotebookID: async (id) => {
-            console.log(id, "From store")
-            var data = localStorage.getItem(id);
-            if (!data) {
-                var resp = await getDrawingData(id)
-                if (resp.status != 200) {
-                    return update((d) => {
-                        d.currentNoteBookID = id
-                        d.noteBookData = []
-                        return d
-                    })
-                }
-                resp = await resp.json()
-                console.log(resp)
-                localStorage.setItem(id, JSON.stringify(resp.drawing_data))
-                var noteBookData = resp.drawing_data
-                console.log(noteBookData)
+            spinner.set(true)
+            console.log("spin")
+            var resp = await getDrawingData(id)
+            if (resp.status != 200) {
+                console.log("spind")
+                spinner.set(false)
+                return update((d) => {
+                    d.currentNoteBookID = id
+                    d.noteBookData = []
+                    return d
+                })
             }
+            resp = await resp.json()
+            console.log(resp, "Respo")
+            var noteBookData = resp.drawing_data
+            console.log(noteBookData)
             update((d) => {
                 d.currentNoteBookID = id
-                d.noteBookData = noteBookData ? noteBookData : data
-                console.log(d,"updated data")
+                d.noteBookData = []
+                if(!noteBookData.length == 0){
+                    for(let i in noteBookData){
+                        noteBookData[i].stageData = JSON.parse(noteBookData[i].stageData)
+                    }
+                    d.noteBookData = noteBookData
+                }
+                console.log(d, "updated data")
                 return d
             })
+            console.log("spind")
+            spinner.set(false)
         },
         saveNotebook: (data) => {
             update(d => {
                 console.log(d)
                 syncTopicDrawingData(data, d.currentNoteBookID).then(() => {
                     console.log("Synced Editor Data");
-                    localStorage.setItem( d.currentNoteBookID, JSON.stringify(data));
+                    localStorage.setItem(d.currentNoteBookID, JSON.stringify(data));
                 });
                 return d
             })
