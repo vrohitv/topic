@@ -11,6 +11,7 @@
         Checkbox,
         Breadcrumb,
         BreadcrumbItem,
+        Spinner
     } from "flowbite-svelte";
     import {
         HomeOutline,
@@ -27,6 +28,7 @@
         recSearch,
         getTopicDataFromServer,
     } from "../store/topicData";
+    import { spinner } from "../store/spinner";
     let innerHTML;
     const dispatch = createEventDispatcher();
     const topicTitlechange = (e) => {
@@ -56,6 +58,11 @@
         >
             {$topic.currentTopic}
         </div>
+        {#if $spinner}
+        <div>
+            <Spinner/>
+        </div>
+        {/if}
     </Toolbar>
 </div>
 

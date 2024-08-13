@@ -142,6 +142,19 @@
   onMount(async () => {
     try {
       var data = await getTopicDataFromServer();
+      if (data.status != 200) {
+        data = {
+          currentHeading: null,
+          currentTopic: "Untitled",
+          currentTopicID: null,
+          currentDrawingID: null,
+          currentEditorID: null,
+          data: [],
+        };
+        topic.set(data);
+        appInitialized = true;
+        return;
+      }
       data = await data.json();
       console.log(data);
       topic.set(data.topicTree);
