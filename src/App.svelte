@@ -47,6 +47,7 @@
   // Interactivity
   $: {
     selected = selected ? selected : "Choose Heading";
+    console.log($topic)
   }
   // Handle Topic Heading Changes to a different one
   function headingChange(data1) {
@@ -156,6 +157,8 @@
         return;
       }
       data = await data.json();
+      data.topicTree.currentTopicID = null;
+      data.topicTree.currentHeading = null;
       console.log(data);
       topic.set(data.topicTree);
       appInitialized = true;
@@ -217,7 +220,8 @@
         </div>
       </div>
       <!-- //EDitor -->
-      <div class="grow-[3]">
+       {#if $topic.currentTopicID != null}
+       <div class="grow-[3]">
         <div>
           <ToolBar
             on:addTopicHeading={addTopicHeading}
@@ -230,6 +234,12 @@
           <Editor bind:editor></Editor>
         </div>
       </div>
+       {:else}
+       <div class="flex justify-center w-full">
+          <p>Please select a topic to edit......</p>
+       </div>
+       {/if}
+      
     </div>
   {:else}
     <div class="relative top-[50%] text-center"><Spinner /></div>

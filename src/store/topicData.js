@@ -20,7 +20,7 @@ export function recSearch(data, id, func) {
 }
 export async function syncTopicHeadingData(data) {
     try {
-        data.currentHeading = null
+        // data.currentHeading = null
         var resp = await fetch("https://" + url + "/topic/heading", {
             method: "POST",
             headers: {
