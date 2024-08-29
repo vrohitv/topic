@@ -137,6 +137,14 @@
       return
     }
     topic.update((data) => {
+      for (let i in data.data) {
+        if (data.data[i].id == data.currentHeading) {
+          if(data.data[i].children.length > 0){
+            alert("Please delete all the topics in the heading before deleting the heading")
+            return
+          }
+        }
+      }
       data.data = data.data.filter((child) => child.id != data.currentHeading);
       data.currentHeading = null;
       syncTopicHeadingData(data).then(() => {
