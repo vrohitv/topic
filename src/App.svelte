@@ -47,7 +47,6 @@
   // Interactivity
   $: {
     selected = selected ? selected : "Choose Heading";
-    console.log($topic)
   }
   // Handle Topic Heading Changes to a different one
   function headingChange(data1) {
