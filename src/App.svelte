@@ -131,8 +131,20 @@
       return data;
     });
   }
-  function deleteHeading(e) {}
-  function deleteTopic(e) {}
+  function deleteHeading(e) {
+    debugger
+    if($topic.currentHeading == null){
+      return
+    }
+    topic.update((data) => {
+      data.data = data.data.filter((child) => child.id != data.currentHeading);
+      data.currentHeading = null;
+      syncTopicHeadingData(data).then(() => {
+        console.log("Synced");
+      });
+      return data;
+    });
+  }
   document.body.addEventListener("OpenDrawingCanvas", async (e) => {
     console.log(e.detail, "drawing canvas load");
     await drawingStore.setCurrentNotebookID(e.detail);
@@ -209,7 +221,10 @@
               class="!p-2 mr-2 w-[40px] h-[40px]"
               ><PlusOutline class="w-5 h-5 " /></Button
             >
-            <Button color="alternative" class="!p-2 w-[40px] h-[40px]"
+            <Button
+              on:click={deleteHeading}
+              color="alternative"
+              class="!p-2 w-[40px] h-[40px]"
               ><TrashBinOutline class="w-5 h-5" /></Button
             >
           </div>
@@ -219,26 +234,24 @@
         </div>
       </div>
       <!-- //EDitor -->
-       {#if $topic.currentTopicID != null}
-       <div class="grow-[3]">
-        <div>
-          <ToolBar
-            on:addTopicHeading={addTopicHeading}
-            on:addTopicInHeading={addTopicInHeading}
-            on:deleteHeading={deleteHeading}
-            on:deleteTopic={deleteTopic}
-          ></ToolBar>
+      {#if $topic.currentTopicID != null}
+        <div class="grow-[3]">
+          <div>
+            <ToolBar
+              on:addTopicHeading={addTopicHeading}
+              on:addTopicInHeading={addTopicInHeading}
+              on:deleteHeading={deleteHeading}
+            ></ToolBar>
+          </div>
+          <div class="mx-12 max-h-[90vh] overflow-scroll">
+            <Editor bind:editor></Editor>
+          </div>
         </div>
-        <div class="mx-12 max-h-[90vh] overflow-scroll">
-          <Editor bind:editor></Editor>
+      {:else}
+        <div class="flex justify-center w-full">
+          <p>Please select a topic....</p>
         </div>
-      </div>
-       {:else}
-       <div class="flex justify-center w-full">
-          <p>Please select a topic to edit......</p>
-       </div>
-       {/if}
-      
+      {/if}
     </div>
   {:else}
     <div class="relative top-[50%] text-center"><Spinner /></div>
