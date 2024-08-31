@@ -33,9 +33,6 @@ function drawingCanvasStore() {
                 d.currentNoteBookID = id
                 d.noteBookData = []
                 if(!noteBookData.length == 0){
-                    for(let i in noteBookData){
-                        noteBookData[i].stageData = JSON.parse(noteBookData[i].stageData)
-                    }
                     d.noteBookData = noteBookData
                 }
                 console.log(d, "updated data")
