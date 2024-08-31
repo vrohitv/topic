@@ -44,6 +44,7 @@
   let drawingBoardopen = false;
   let editor;
   let dropDownOpen = false;
+  let currentTopicID = null;
   // Interactivity
   $: {
     selected = selected ? selected : "Choose Heading";
@@ -57,6 +58,10 @@
       return data;
     });
     dropDownOpen = false;
+  }
+  // Handle Topic Open in Editor
+  function onTopicInEditorDispatchHandler(e){
+    currentTopicID = e.detail
   }
   // Handle add Topic Heading
   function addTopicHeading(e) {
@@ -238,7 +243,7 @@
           </div>
         </div>
         <div class="grow-1 overflow-scroll relative top-[-8px]">
-          <TreeView data={$topicTreeDataRead} />
+          <TreeView data={$topicTreeDataRead} on:topicOpenInEditor={onTopicInEditorDispatchHandler}/>
         </div>
       </div>
       <!-- //EDitor -->
@@ -246,13 +251,10 @@
         <div class="grow-[3]">
           <div>
             <ToolBar
-              on:addTopicHeading={addTopicHeading}
-              on:addTopicInHeading={addTopicInHeading}
-              on:deleteHeading={deleteHeading}
-            ></ToolBar>
+             ></ToolBar>
           </div>
           <div class="mx-12 max-h-[90vh] overflow-scroll">
-            <Editor bind:editor></Editor>
+            <Editor bind:editor bind:currentTopicID ></Editor>
           </div>
         </div>
       {:else}

@@ -16,14 +16,13 @@
         getTopicDataFromServer,
     } from "../store/topicData.js";
     const dispatch = createEventDispatcher();
+    export let currentTopicName = null;
     const goToTopic = (e) => {
-        // console.log("Event dispatch ");
         var el = e.target;
         while (el.nodeName != "LI") {
             // console.log(el)
             el = el.parentNode;
         }
-        // console.log(el);
         topic.update((data) => {
                 var x = recSearch(data.data, el.id, (d) => {
                     return {
@@ -33,16 +32,17 @@
                         currentEditorID: d.editorID
                     }
                 })
+                currentTopicName = x.currentTopic
                 data.currentEditorID = x.currentEditorID
                 data.currentTopicID = x.currentTopicID
                 data.currentTopic = x.currentTopic
                 data.currentDrawingID = x.currentDrawingID
                 return data
             })
-        // console.log("Event dispatch ");
-        document.dispatchEvent(
-            new CustomEvent("topicOpenInEditor", { detail: el.id }),
-        );
+        // document.dispatchEvent(
+        //     new CustomEvent("topicOpenInEditor", { detail: el.id }),
+        // );
+        dispatch("topicOpenInEditor", el.id);
     };
     const addSubTopic = (e) => {
         var el = e.target;
