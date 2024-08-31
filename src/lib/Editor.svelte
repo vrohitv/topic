@@ -11,7 +11,7 @@
     import Checklist from "@editorjs/checklist";
     import SimpleImage from "@editorjs/simple-image";
     import Table from "@editorjs/table";
-    import CodeTool from "@editorjs/code";
+    // import CodeTool from "@editorjs/code";
     import Marker from "@editorjs/marker";
     import InlineCode from "@editorjs/inline-code";
     import Underline from "@editorjs/underline";
@@ -99,7 +99,7 @@
                 },
                 image: SimpleImage,
                 table: Table,
-                code: CodeTool,
+                // code: CodeTool,
                 Marker: {
                     class: Marker,
                     // shortcut: "CMD+SHIFT+M",
