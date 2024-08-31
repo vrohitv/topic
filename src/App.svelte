@@ -131,8 +131,28 @@
       return data;
     });
   }
-  function deleteHeading(e) {}
-  function deleteTopic(e) {}
+  function deleteHeading(e) {
+    debugger
+    if($topic.currentHeading == null){
+      return
+    }
+    topic.update((data) => {
+      for (let i in data.data) {
+        if (data.data[i].id == data.currentHeading) {
+          if(data.data[i].children.length > 0){
+            alert("Please delete all the topics in the heading before deleting the heading")
+            return
+          }
+        }
+      }
+      data.data = data.data.filter((child) => child.id != data.currentHeading);
+      data.currentHeading = null;
+      syncTopicHeadingData(data).then(() => {
+        console.log("Synced");
+      });
+      return data;
+    });
+  }
   document.body.addEventListener("OpenDrawingCanvas", async (e) => {
     console.log(e.detail, "drawing canvas load");
     await drawingStore.setCurrentNotebookID(e.detail);
@@ -156,6 +176,8 @@
         return;
       }
       data = await data.json();
+      data.topicTree.currentTopicID = null;
+      data.topicTree.currentHeading = null;
       console.log(data);
       topic.set(data.topicTree);
       appInitialized = true;
@@ -207,7 +229,10 @@
               class="!p-2 mr-2 w-[40px] h-[40px]"
               ><PlusOutline class="w-5 h-5 " /></Button
             >
-            <Button color="alternative" class="!p-2 w-[40px] h-[40px]"
+            <Button
+              on:click={deleteHeading}
+              color="alternative"
+              class="!p-2 w-[40px] h-[40px]"
               ><TrashBinOutline class="w-5 h-5" /></Button
             >
           </div>
@@ -217,19 +242,24 @@
         </div>
       </div>
       <!-- //EDitor -->
-      <div class="grow-[3]">
-        <div>
-          <ToolBar
-            on:addTopicHeading={addTopicHeading}
-            on:addTopicInHeading={addTopicInHeading}
-            on:deleteHeading={deleteHeading}
-            on:deleteTopic={deleteTopic}
-          ></ToolBar>
+      {#if $topic.currentTopicID != null}
+        <div class="grow-[3]">
+          <div>
+            <ToolBar
+              on:addTopicHeading={addTopicHeading}
+              on:addTopicInHeading={addTopicInHeading}
+              on:deleteHeading={deleteHeading}
+            ></ToolBar>
+          </div>
+          <div class="mx-12 max-h-[90vh] overflow-scroll">
+            <Editor bind:editor></Editor>
+          </div>
         </div>
-        <div class="mx-12 max-h-[90vh] overflow-scroll">
-          <Editor bind:editor></Editor>
+      {:else}
+        <div class="flex justify-center w-full">
+          <p>Please select a topic....</p>
         </div>
-      </div>
+      {/if}
     </div>
   {:else}
     <div class="relative top-[50%] text-center"><Spinner /></div>

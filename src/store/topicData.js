@@ -18,9 +18,25 @@ export function recSearch(data, id, func) {
         }
     }
 }
+export function recSearchReturnParent(data, id, func,parent="") {
+    for (let i in data) {
+        if (data[i].id == id) {
+            return func(data[i],parent)
+        } else {
+            if (!data[i].children) {
+                continue
+            }
+            var y = recSearchReturnParent(data[i].children, id, func,data[i])
+            if (!y) {
+                continue
+            }
+            return y
+        }
+    }
+}
 export async function syncTopicHeadingData(data) {
     try {
-        data.currentHeading = null
+        // data.currentHeading = null
         var resp = await fetch("https://" + url + "/topic/heading", {
             method: "POST",
             headers: {

@@ -18,6 +18,7 @@
         EnvelopeOutline,
         ImageOutline,
         ChevronDownOutline,
+        TrashBinOutline
     } from "flowbite-svelte-icons";
     import { createEventDispatcher } from "svelte";
     import {
@@ -27,13 +28,14 @@
         syncTopicHeadingData,
         recSearch,
         getTopicDataFromServer,
+        recSearchReturnParent
     } from "../store/topicData";
     import { spinner } from "../store/spinner";
     let innerHTML;
     const dispatch = createEventDispatcher();
     const topicTitlechange = (e) => {
+        e.preventDefault()
         if (e.key == "Enter") {
-            console.log(innerHTML);
             topic.update((data) => {
                 recSearch(data.data, data.currentTopicID, (d) => {
                     d.name = innerHTML;
@@ -45,6 +47,34 @@
             });
         }
     };
+    const deleteCurrentNoteBook = (e)=>{
+        e.preventDefault()
+            topic.update((data) => {
+                recSearchReturnParent(data.data, data.currentTopicID, (d,parent) => {
+                    if(d.children){
+                        alert(`Please delete all the subtopics of ${d.name} before deleting .`)
+                        return
+                    }
+                    var consent = confirm(`Are you sure you want to delete ${d.name} topic from ${parent.name}?`)
+                    if(consent){
+                        parent.children = parent.children.filter((child)=>child.id != d.id)
+                        parent.numChildren = parent.children.length
+                        if(parent.children.length == 0){
+                            if(parent.editorID){
+                                delete parent.children
+                                delete parent.numChildren
+                            }
+                        }
+                    }
+                });
+                data.currentTopicID = null
+                data.currentTopic = null
+                syncTopicHeadingData(data).then(() => {
+                    console.log("Synced");
+                });
+                return data;
+            });
+    }
 </script>
 
 <div>
@@ -57,6 +87,11 @@
             bind:innerHTML
         >
             {$topic.currentTopic}
+        </div>
+        <div class="ml-2">
+            <Button on:click={deleteCurrentNoteBook} color="alternative" class="!p-2 w-[35px] h-[35 px]"
+              ><TrashBinOutline class="w-5 h-5" /></Button
+            >
         </div>
         {#if $spinner}
         <div>
