@@ -34,7 +34,7 @@
     const topicTitlechange = (e) => {
         if (e.key == "Enter") {
             console.log(innerHTML);
-            update((data) => {
+            topic.update((data) => {
                 recSearch(data.data, data.currentTopicID, (d) => {
                     d.name = innerHTML;
                 });

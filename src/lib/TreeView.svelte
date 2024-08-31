@@ -17,6 +17,7 @@
     } from "../store/topicData.js";
     const dispatch = createEventDispatcher();
     const goToTopic = (e) => {
+        // console.log("Event dispatch ");
         var el = e.target;
         while (el.nodeName != "LI") {
             // console.log(el)
@@ -38,6 +39,7 @@
                 data.currentDrawingID = x.currentDrawingID
                 return data
             })
+        // console.log("Event dispatch ");
         document.dispatchEvent(
             new CustomEvent("topicOpenInEditor", { detail: el.id }),
         );
