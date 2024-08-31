@@ -34,8 +34,8 @@
     let innerHTML;
     const dispatch = createEventDispatcher();
     const topicTitlechange = (e) => {
+        e.preventDefault()
         if (e.key == "Enter") {
-            e.preventDefault()
             topic.update((data) => {
                 recSearch(data.data, data.currentTopicID, (d) => {
                     d.name = innerHTML;

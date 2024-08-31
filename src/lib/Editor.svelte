@@ -14,8 +14,8 @@
     document.addEventListener("topicOpenInEditor", async (e) => {
         currentID = e.detail;
         spinner.set(true)
-        console.log("spin")
-
+        // console.log("spin")
+        // console.log("Event Caught:");
         var resp = await getEditorData(currentID);
         if (resp.status != 200) {
             await editor.blocks.render({
@@ -29,7 +29,7 @@
                 ],
                 version: "2.30.2",
             });
-            console.log("spind")
+            // console.log("spind")
             spinner.set(false)
             return
         }
