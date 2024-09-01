@@ -25,39 +25,7 @@
     import { spinner } from "../store/spinner";
     export let editor;
     export let currentTopicID;
-    $: {
-        setEditorData(currentTopicID);
-    }
     // document.addEventListener("topicOpenInEditor", async (e) => {
-    async function setEditorData(id) {
-        console.log("setting Editor data running");
-        var currentID = id;
-        spinner.set(true);
-        // console.log("spin")
-        // console.log("Event Caught:");
-        var resp = await getEditorData(currentID);
-        if (resp.status != 200) {
-            await editor.blocks.render({
-                time: 1723084898048,
-                blocks: [
-                    {
-                        id: "IxoomqzyjD",
-                        type: "paragraph",
-                        data: { text: "..." },
-                    },
-                ],
-                version: "2.30.2",
-            });
-            // console.log("spind")
-            spinner.set(false);
-            return;
-        }
-        resp = await resp.json();
-        // console.log(resp);
-        await editor.blocks.render(resp.editor_data);
-        // console.log("spind")
-        spinner.set(false);
-    }
     async function onChangeHandler(e) {
         spinner.set(true);
         console.log("spin");

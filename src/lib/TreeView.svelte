@@ -16,33 +16,11 @@
         getTopicDataFromServer,
     } from "../store/topicData.js";
     const dispatch = createEventDispatcher();
-    export let currentTopicName = null;
+    export let currentTopicChangeFunction = () => {};
     const goToTopic = (e) => {
-        var el = e.target;
-        while (el.nodeName != "LI") {
-            // console.log(el)
-            el = el.parentNode;
-        }
-        topic.update((data) => {
-                var x = recSearch(data.data, el.id, (d) => {
-                    return {
-                        currentTopicID: d.id,
-                        currentTopic: d.name,
-                        currentDrawingID: d.drawingID,
-                        currentEditorID: d.editorID
-                    }
-                })
-                currentTopicName = x.currentTopic
-                data.currentEditorID = x.currentEditorID
-                data.currentTopicID = x.currentTopicID
-                data.currentTopic = x.currentTopic
-                data.currentDrawingID = x.currentDrawingID
-                return data
-            })
-        // document.dispatchEvent(
-        //     new CustomEvent("topicOpenInEditor", { detail: el.id }),
-        // );
-        dispatch("topicOpenInEditor", el.id);
+        console.log(currentTopicChangeFunction);
+        console.log(e);
+        currentTopicChangeFunction(e);
     };
     const gotToTopicRecForward = (e)=>{
         console.log("callled")
