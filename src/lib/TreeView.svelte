@@ -22,6 +22,10 @@
         console.log(e);
         currentTopicChangeFunction(e);
     };
+    const gotToTopicRecForward = (e)=>{
+        console.log("callled")
+        dispatch("topicOpenInEditor", e);
+    }
     const addSubTopic = (e) => {
         var el = e.target;
         while (el.nodeName != "LI") {
@@ -92,7 +96,7 @@
                             >
                         </div>
                     </summary>
-                    <svelte:self data={data.children} currentTopicChangeFunction={currentTopicChangeFunction}/>
+                    <svelte:self data={data.children} currentTopicName={currentTopicName} on:topicOpenInEditor={gotToTopicRecForward}/>
                 </details>
             </li>
         {:else}
