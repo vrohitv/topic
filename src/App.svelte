@@ -8,6 +8,9 @@
   import ToolBar from "./lib/ToolBar.svelte";
   import Editor from "./lib/Editor.svelte";
   import TreeView from "./lib/TreeView.svelte";
+  import { spinner } from "./store/spinner";
+  import { getEditorData, syncTopicEditorData } from "./lib/Editor.helper";
+
   import {
     Label,
     Select,
@@ -60,8 +63,55 @@
     dropDownOpen = false;
   }
   // Handle Topic Open in Editor
-  function onTopicInEditorDispatchHandler(e){
-    currentTopicID = e.detail
+  async function currentTopicChangeFunction(e){
+    var el = e.target;
+        while (el.nodeName != "LI") {
+            // console.log(el)
+            el = el.parentNode;
+        }
+        topic.update((data) => {
+                var x = recSearch(data.data, el.id, (d) => {
+                    return {
+                        currentTopicID: d.id,
+                        currentTopic: d.name,
+                        currentDrawingID: d.drawingID,
+                        currentEditorID: d.editorID
+                    }
+                })
+                data.currentEditorID = x.currentEditorID
+                data.currentTopicID = x.currentTopicID
+                data.currentTopic = x.currentTopic
+                data.currentDrawingID = x.currentDrawingID
+                return data
+            })
+            console.log("setting Editor data running");
+            currentTopicID = el.id;
+        var currentID = el.id;
+        spinner.set(true);
+        // console.log("spin")
+        // console.log("Event Caught:");
+        var resp = await getEditorData(currentID);
+        if (resp.status != 200) {
+            await editor.blocks.render({
+                time: 1723084898048,
+                blocks: [
+                    {
+                        id: "IxoomqzyjD",
+                        type: "paragraph",
+                        data: { text: "..." },
+                    },
+                ],
+                version: "2.30.2",
+            });
+            // console.log("spind")
+            spinner.set(false);
+            return;
+        }
+        resp = await resp.json();
+        // console.log(resp);
+        await editor.blocks.render(resp.editor_data);
+        // console.log("spind")
+        spinner.set(false);
   }
   // Handle add Topic Heading
   function addTopicHeading(e) {
@@ -243,18 +293,17 @@
           </div>
         </div>
         <div class="grow-1 overflow-scroll relative top-[-8px]">
-          <TreeView data={$topicTreeDataRead} on:topicOpenInEditor={onTopicInEditorDispatchHandler}/>
+          <TreeView data={$topicTreeDataRead} currentTopicChangeFunction={currentTopicChangeFunction} />
         </div>
       </div>
       <!-- //EDitor -->
       {#if $topic.currentTopicID != null}
         <div class="grow-[3]">
           <div>
-            <ToolBar
-             ></ToolBar>
+            <ToolBar></ToolBar>
           </div>
           <div class="mx-12 max-h-[90vh] overflow-scroll">
-            <Editor bind:editor bind:currentTopicID ></Editor>
+            <Editor bind:editor bind:currentTopicID></Editor>
           </div>
         </div>
       {:else}
