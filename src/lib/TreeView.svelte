@@ -96,7 +96,7 @@
                             >
                         </div>
                     </summary>
-                    <svelte:self data={data.children} currentTopicName={currentTopicName} on:topicOpenInEditor={gotToTopicRecForward}/>
+                    <svelte:self data={data.children} currentTopicChangeFunction={currentTopicChangeFunction} on:topicOpenInEditor={gotToTopicRecForward}/>
                 </details>
             </li>
         {:else}
